@@ -12,20 +12,19 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', static function (Blueprint $table): void {
+        Schema::create('m_config', function (Blueprint $table): void {
             $table->id();
-            $table->string('username');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('type', 10)->nullable()->comment('admin|operator');
+            $table->string('clock_in', 10);
+            $table->string('clock_out', 10);
+            $table->string('schedule_send_notif', 10);
+            $table->integer('school_id');
             $table->boolean('active')->default(true);
-            $table->rememberToken();
-            $table->timestamps();
-            $table->softDeletes();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
 
+            $table->foreign('school_id')->references('id')->on('m_school');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });
@@ -36,6 +35,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('m_config');
     }
 };

@@ -12,20 +12,17 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', static function (Blueprint $table): void {
+        Schema::create('t_presence_detail', function (Blueprint $table): void {
             $table->id();
-            $table->string('username');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('type', 10)->nullable()->comment('admin|operator');
-            $table->boolean('active')->default(true);
-            $table->rememberToken();
-            $table->timestamps();
-            $table->softDeletes();
+            $table->integer('presence_id');
+            $table->time('clock_in', 6)->nullable();
+            $table->time('clock_out', 6)->nullable();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
 
+            $table->foreign('presence_id')->references('id')->on('t_presence');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });
@@ -36,6 +33,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('t_presence_detail');
     }
 };

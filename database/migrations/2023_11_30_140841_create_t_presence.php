@@ -12,20 +12,19 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', static function (Blueprint $table): void {
+        Schema::create('t_presence', function (Blueprint $table): void {
             $table->id();
-            $table->string('username');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('type', 10)->nullable()->comment('admin|operator');
+            $table->integer('student_id');
+            $table->date('date');
+            $table->string('status', 20)->default('presence')->comment('presence|absence|sick|leaves|others');
+            $table->string('description')->nullable()->comment('only filled in when status = sick|leaves|others');
             $table->boolean('active')->default(true);
-            $table->rememberToken();
+            $table->integer('created_by')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->integer('created_by');
-            $table->integer('updated_by')->nullable();
 
+            $table->foreign('student_id')->references('id')->on('m_student');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });
@@ -36,6 +35,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('t_presence');
     }
 };

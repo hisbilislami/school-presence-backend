@@ -12,20 +12,20 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', static function (Blueprint $table): void {
+        Schema::create('m_homeroom_teacher', function (Blueprint $table): void {
             $table->id();
-            $table->string('username');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('type', 10)->nullable()->comment('admin|operator');
+            $table->string('email', 50);
+            $table->integer('class_id');
+            $table->integer('person_id');
+            $table->string('mobile_phone_number')->nullable();
             $table->boolean('active')->default(true);
-            $table->rememberToken();
-            $table->timestamps();
-            $table->softDeletes();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
 
+            $table->foreign('class_id')->references('id')->on('m_class');
+            $table->foreign('person_id')->references('id')->on('m_person');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });
@@ -36,6 +36,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('m_homeroom_teacher');
     }
 };
