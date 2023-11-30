@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('t_presence_detail', function (Blueprint $table): void {
+        Schema::create('t_presence_detail', static function (Blueprint $table): void {
             $table->id();
             $table->integer('presence_id');
             $table->time('clock_in', 6)->nullable();

@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('t_presence', function (Blueprint $table): void {
+        Schema::create('t_presence', static function (Blueprint $table): void {
             $table->id();
             $table->integer('student_id');
             $table->date('date');

@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('rel_person_user', function (Blueprint $table): void {
+        Schema::create('rel_person_user', static function (Blueprint $table): void {
             $table->id();
             $table->integer('person_id');
             $table->integer('user_id');

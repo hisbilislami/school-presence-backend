@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('m_config', function (Blueprint $table): void {
+        Schema::create('m_config', static function (Blueprint $table): void {
             $table->id();
             $table->string('clock_in', 10);
             $table->string('clock_out', 10);

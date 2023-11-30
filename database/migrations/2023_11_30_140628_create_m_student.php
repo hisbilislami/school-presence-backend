@@ -12,7 +12,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('m_student', function (Blueprint $table): void {
+        Schema::create('m_student', static function (Blueprint $table): void {
             $table->id();
             $table->integer('person_id');
             $table->string('nis', 25);
