@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.13",
         "brainmaestro/composer-git-hooks": "v3.0.0-alpha.1",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.40",
@@ -26,6 +27,12 @@
         "phpunit/phpunit": "^10.1",
         "spatie/laravel-ignition": "^2.0"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/Jubeki/composer-git-hooks"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
@@ -39,23 +46,33 @@
         }
     },
     "scripts": {
+        "cghooks": "./vendor/bin/cghooks",
+        "post-install-cmd": "cghooks add --ignore-lock",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "cghooks update"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "fix": "./vendor/bin/php-cs-fixer fix -vvv --config=.php-cs-fixer.dist.php --show-progress=dots",
+        "analyse": "composer fix && ./vendor/bin/phpstan analyse --memory-limit=2G",
+        "analyse-git": "./vendor/bin/phpstan analyse --memory-limit=1G --no-progress --error-format github > phpstan.json",
+        "helper-models": "./artisan ide-helper:models --write --ignore=\"\" && ./artisan ide-helper:meta"
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "barryvdh/laravel-ide-helper"
+            ]
         },
         "hooks": {
             "pre-commit": [
@@ -72,6 +89,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "composer/package-versions-deprecated": true,
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
