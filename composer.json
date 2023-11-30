@@ -2,7 +2,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.1",
@@ -12,7 +15,9 @@
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
+        "brainmaestro/composer-git-hooks": "v3.0.0-alpha.1",
         "fakerphp/faker": "^1.9.1",
+        "friendsofphp/php-cs-fixer": "^3.40",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
@@ -51,6 +56,15 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "hooks": {
+            "pre-commit": [
+                "./vendor/bin/php-cs-fixer fix -vvv --config=.php-cs-fixer.dist.php --show-progress=dots"
+            ],
+            "pre-push": [
+                "./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run"
+            ],
+            "post-merge": "composer install"
         }
     },
     "config": {
