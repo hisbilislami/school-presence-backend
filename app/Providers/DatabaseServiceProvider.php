@@ -14,7 +14,7 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        DB::listen(function ($query): void {
+        DB::listen(static function ($query): void {
             if ('SELECT' === strtoupper(substr($query->sql, 0, 6))) {
                 DB::setDefaultConnection('pgsql_read');
             } else {

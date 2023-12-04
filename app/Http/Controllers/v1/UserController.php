@@ -13,9 +13,7 @@ class UserController extends Controller
 {
     protected $model;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Login user and create token.

@@ -189,8 +189,6 @@ trait ApiResponse
     /**
      * Pagination function.
      *
-     * @param array $search_tags
-     *
      * @return object
      */
     private function paginate(Builder $query, array $searchFields = ['name'], bool $customSearch = false)
@@ -219,7 +217,7 @@ trait ApiResponse
                 // grouping searchTerm into one "AND"
                 // example in sql is like " .... AND(name ILIKE '%AU%' OR code ILIKE '%AU%')"
                 $query = $query->where(
-                    function ($query) use ($searchFields, $queryTerm, $multipleSearch, $exactSearch): void {
+                    static function ($query) use ($searchFields, $queryTerm, $multipleSearch, $exactSearch): void {
                         foreach ($searchFields as $index => $search) { // loop for specific column search
                             // if use multiple search, use term index
                             $term = ($multipleSearch || $exactSearch) ? $queryTerm[$index] : $queryTerm;
@@ -269,8 +267,9 @@ trait ApiResponse
         $rawQuery = $this->getQueryWithBindings($builder);
         // calculate hashed value of query
         $hashedQuery = crc32($rawQuery);
+
         // if total is available, return it instead of direct query
-        return (int) Cache::remember('total_query_'.$hashedQuery, 45 * 60, function () use ($rawQuery) {
+        return (int) Cache::remember('total_query_'.$hashedQuery, 45 * 60, static function () use ($rawQuery) {
             // store total for 45 minutes
             return DB::select("SELECT COUNT(*) AS aggregate FROM ({$rawQuery}) AS total")[0]->aggregate;
         });
@@ -281,7 +280,7 @@ trait ApiResponse
         $sql = $query->toSql();
         $bindings = $query->getBindings();
 
-        return preg_replace_callback('/\?/', function ($match) use (&$bindings) {
+        return preg_replace_callback('/\?/', static function ($match) use (&$bindings) {
             return str_replace('"', "'", json_encode(array_shift($bindings)));
         }, $sql);
     }
@@ -364,7 +363,6 @@ trait ApiResponse
      * @param bool       $skipQueryfilter : use for skip using function filter query on paginate function. you can use this in case your query has long union query. But in the other hands you have add where clause school_id by your self and order by if needed
      *                                    Default Value is False
      * @param mixed|null $orderBy
-     * @param mixed      $sortBy
      */
     public function okApiResponse(mixed $data, string $message = 'Success', array $searchFields = ['name'], bool $customSearch = false, bool $transactionTable = false, $orderBy = null, $sortBy = 'DESC', $skipQueryfilter = false): JsonResponse
     {

@@ -27,13 +27,9 @@ class BillUserProvider implements BaseEloquentUserProvider
         // ;
     }
 
-    public function retrieveByToken($identifier, $token): void
-    {
-    }
+    public function retrieveByToken($identifier, $token): void {}
 
-    public function updateRememberToken(Authenticatable $user, $token): void
-    {
-    }
+    public function updateRememberToken(Authenticatable $user, $token): void {}
 
     public function retrieveByCredentials(array $credentials): void
     {
@@ -50,7 +46,5 @@ class BillUserProvider implements BaseEloquentUserProvider
         // ;
     }
 
-    public function validateCredentials(Authenticatable $user, array $credentials): void
-    {
-    }
+    public function validateCredentials(Authenticatable $user, array $credentials): void {}
 }

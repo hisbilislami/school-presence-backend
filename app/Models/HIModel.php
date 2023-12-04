@@ -254,8 +254,6 @@ class HIModel extends Model
 
     /**
      * Function Update batch only.
-     *
-     * @param mixed $items
      */
     // update data on registration
     public function updateOnlyByFk($items)

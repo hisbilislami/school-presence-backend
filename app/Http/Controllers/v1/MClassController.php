@@ -23,8 +23,6 @@ class MClassController extends Controller
 
     /**
      * Get data (single / bulk).
-     *
-     * @param mixed
      */
     public function get(Request $request)
     {
