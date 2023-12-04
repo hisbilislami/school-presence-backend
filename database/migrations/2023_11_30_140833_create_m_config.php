@@ -19,7 +19,7 @@ return new class() extends Migration {
             $table->string('schedule_send_notif', 10);
             $table->integer('school_id');
             $table->boolean('active')->default(true);
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();

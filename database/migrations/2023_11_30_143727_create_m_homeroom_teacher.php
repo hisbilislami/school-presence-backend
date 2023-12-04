@@ -19,7 +19,7 @@ return new class() extends Migration {
             $table->integer('person_id');
             $table->string('mobile_phone_number')->nullable();
             $table->boolean('active')->default(true);
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -16,13 +16,15 @@ return new class() extends Migration {
             $table->id();
             $table->integer('person_id');
             $table->integer('user_id');
-            $table->integer('created_by');
+            $table->integer('school_id');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('person_id')->references('id')->on('m_person');
             $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('school_id')->references('id')->on('m_school');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });

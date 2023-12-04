@@ -17,7 +17,7 @@ return new class() extends Migration {
             $table->integer('presence_id');
             $table->time('clock_in', 6)->nullable();
             $table->time('clock_out', 6)->nullable();
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();

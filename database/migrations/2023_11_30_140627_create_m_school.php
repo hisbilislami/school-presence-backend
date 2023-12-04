@@ -20,7 +20,7 @@ return new class() extends Migration {
             $table->boolean('active')->default(true);
             $table->softDeletes();
             $table->timestamps();
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
 
             $table->foreign('created_by')->references('id')->on('users');

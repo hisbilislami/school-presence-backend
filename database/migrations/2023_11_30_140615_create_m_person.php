@@ -19,7 +19,7 @@ return new class() extends Migration {
             $table->string('address')->nullable();
             $table->string('gender', 1)->comment('M for male, F for female');
             $table->boolean('active')->default(true);
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();

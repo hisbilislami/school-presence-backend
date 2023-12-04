@@ -18,7 +18,7 @@ return new class() extends Migration {
             $table->string('name', 20);
             $table->integer('school_id');
             $table->boolean('active')->default(true);
-            $table->integer('created_by');
+            $table->integer('created_by')->nullabel();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -16,7 +16,7 @@ return new class() extends Migration {
             $table->id();
             $table->integer('parent_id');
             $table->integer('student_id');
-            $table->integer('created_by');
+            $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
