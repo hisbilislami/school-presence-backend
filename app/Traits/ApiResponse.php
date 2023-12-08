@@ -74,7 +74,7 @@ trait ApiResponse
         if (!\in_array($tableName, config('global-table'), true)) {
             $user = Auth::user();
             if (null === $school_id) {
-                $school_id = $user->relPersonUsers->first()->school_id ?? null;
+                $school_id = $user->relPersonUsers[0]->school_id ?? null;
             }
             if ('m_school' !== $tableName) {
                 if (str_contains($tableName, 'm_')) {
@@ -111,13 +111,13 @@ trait ApiResponse
     {
         $auth = Auth::user();
         if ($auth) {
-            $schoolId = $auth->relPersonUsers->first()->school_id;
+            $schoolId = $auth->relPersonUsers[0]->school_id;
         } elseif (null !== $userId) {
             $user = User::find($userId);
             if (null === $user) {
                 return false;
             }
-            $schoolId = $user->relPersonUsers->first()->school_id;
+            $schoolId = $user->relPersonUsers[0]->school_id;
         } else {
             return false;
         }

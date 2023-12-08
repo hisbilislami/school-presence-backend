@@ -47,7 +47,12 @@ class MClass extends HIModel
 
     public function getData(int $id = null)
     {
-        return DB::table($this->table)->select('*')->whereNull('deleted_at');
+        $result = DB::table($this->table)->select('*')->whereNull('deleted_at');
+        if (null !== $id) {
+            $result->where('id', $id);
+        }
+
+        return $result;
     }
 
     /**
