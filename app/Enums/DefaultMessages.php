@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum DefaultMessage: string
+enum DefaultMessages: string
 {
     case ACTION_SUCCESS = 'Success.';
     case ACTION_FAILED = 'Cannot perform this action. We will fix this shortly.';

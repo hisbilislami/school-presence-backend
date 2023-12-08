@@ -105,11 +105,11 @@ class HIModel extends Model
             date_default_timezone_set($timezone);
             if (str_contains($this->table, 'm_')) {
                 $initTenant = [
-                    'school_id' => $user->relPersonUsers->first()->school_id ?? null,
+                    'school_id' => $user->relPersonUsers[0]->school_id ?? null,
                 ];
             } elseif (str_contains($this->table, 't_')) {
                 $initTenant = [
-                    'school_id' => $user->relPersonUsers->first()->school_id ?? null,
+                    'school_id' => $user->relPersonUsers[0]->school_id ?? null,
                 ];
             }
         }

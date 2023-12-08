@@ -56,25 +56,25 @@ class MClassController extends Controller
             );
 
             foreach ($request->all() as $data) {
-                $check = MClass::where('school_id', Auth::user()->relPersonUsers->first()->school_id)->where('code', $data['code'])->first();
+                $check = MClass::where('school_id', Auth::user()->relPersonUsers[0]->school_id)->where('code', $data['code'])->first();
                 if ($check) {
                     return $this->badRequestApiResponse(['message' => 'The code you entered already exist!']);
                 }
-                $data['school_id'] = Auth::user()->relPersonUsers->first()->school_id;
+                $data['school_id'] = Auth::user()->relPersonUsers[0]->school_id;
                 $results = $this->model->batchOperations([$data], 'insert');
             }
             DB::commit();
 
             return $this->createdApiResponse($results);
         } catch (ValidationException $e) {
-            DB::commit();
+            DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
         } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
-            DB::commit();
+            DB::rollBack();
 
             return $this->badRequestApiResponse(['message' => DefaultMessages::ACTION_FAILED]);
         }
@@ -97,7 +97,7 @@ class MClassController extends Controller
             );
 
             foreach ($request->all() as $data) {
-                $check = MClass::where('school_id', Auth::user()->relPersonUsers->first()->school_id)->where('code', $data['code'])->first();
+                $check = MClass::where('school_id', Auth::user()->relPersonUsers[0]->school_id)->where('code', $data['code'])->first();
                 if ($check && $check->id !== (int) $data['id']) {
                     return $this->badRequestApiResponse(['message' => 'The code you entered already exist!']);
                 }
@@ -108,14 +108,14 @@ class MClassController extends Controller
 
             return $this->createdApiResponse($results);
         } catch (ValidationException $e) {
-            DB::commit();
+            DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
         } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
-            DB::commit();
+            DB::rollBack();
 
             return $this->badRequestApiResponse(['message' => DefaultMessages::ACTION_FAILED]);
         }
@@ -127,42 +127,19 @@ class MClassController extends Controller
     public function delete(Request $request)
     {
         try {
+            DB::beginTransaction();
             // Validate request
             $request->validate(
                 [
                     '*.id' => 'required|integer|exists:m_class,id',
                 ]
             );
-
-            foreach ($request->all() as $req) {
-                // // get Id MClass From Request
-                // $id = $req['id'];
-                //
-                // // list Relation
-                // $listRelation = [
-                //     'm_homeroom_teacher',
-                // ];
-                //
-                // // find whole data with relation
-                // $classModel = MClass::with($listRelation)
-                //     ->where('id', $id)
-                //     ->first()
-                // ;
-                //
-                // // validate Foreign key
-                // foreach ($listRelation as $relation) {
-                //     if (null !== $classModel->{$relation}) {
-                //         if ($classModel->{$relation}->count() > 0) {
-                //             return $this->badRequestApiResponse(['message' => 'Data cannot be deleted because has been used on transaction']);
-                //         }
-                //     }
-                // }
-            }
-
             $results = $this->model->batchOperations($request->all(), 'delete');
+            DB::commit();
 
             return $this->okApiResponse($results);
         } catch (\Throwable $th) {
+            DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
             }

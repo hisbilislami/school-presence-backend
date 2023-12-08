@@ -1,0 +1,21 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+    - ./vendor/timeweb/phpstan-enum/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    # The level 9 is the highest level
+    level: 5
+
+    tmpDir: tmp
+
+    ignoreErrors:
+        - '#PHPDoc#'
+        - '#might not be defined.#'
+
+    checkMissingIterableValueType: false
+
+    parallel:
+        maximumNumberOfProcesses: 2
