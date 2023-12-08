@@ -25,4 +25,5 @@ Route::group(['middleware' => 'auth:sanctum'], function (): void {
     require 'v1/class.api.php';
     require 'v1/student.api.php';
     require 'v1/school.api.php';
+    require 'v1/homeRoomTeacher.api.php';
 });
