@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 /**
  * @property int     $id
  * @property int     $person_id
@@ -22,6 +24,7 @@ namespace App\Models;
  */
 class RelPersonUser extends HIModel
 {
+    use SoftDeletes;
     /**
      * The table associated with the model.
      *
