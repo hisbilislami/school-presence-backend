@@ -51,7 +51,7 @@ class UserController extends Controller
         }
 
         $user = User::where('username', $request['username'])
-            ->firstOrFail()
+            ->first()
         ;
 
         if ($user) {
@@ -60,6 +60,10 @@ class UserController extends Controller
                     'message' => 'Unverified. Please, verify your email address.',
                 ], 401);
             }
+        } else {
+            return response()->json([
+                'message' => 'Username not found.',
+            ], 401);
         }
 
         $user = $request->user();
