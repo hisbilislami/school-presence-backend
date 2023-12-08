@@ -8,7 +8,6 @@ use App\Enums\DefaultMessages;
 use App\Http\Controllers\Controller;
 use App\Models\MSchool;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -134,31 +133,6 @@ class MSchoolController extends Controller
                     '*.id' => 'required|integer|exists:m_school,id',
                 ]
             );
-
-            foreach ($request->all() as $req) {
-                // // get Id MClass From Request
-                // $id = $req['id'];
-                //
-                // // list Relation
-                // $listRelation = [
-                //     'm_homeroom_teacher',
-                // ];
-                //
-                // // find whole data with relation
-                // $classModel = MClass::with($listRelation)
-                //     ->where('id', $id)
-                //     ->first()
-                // ;
-                //
-                // // validate Foreign key
-                // foreach ($listRelation as $relation) {
-                //     if (null !== $classModel->{$relation}) {
-                //         if ($classModel->{$relation}->count() > 0) {
-                //             return $this->badRequestApiResponse(['message' => 'Data cannot be deleted because has been used on transaction']);
-                //         }
-                //     }
-                // }
-            }
 
             $results = $this->model->batchOperations($request->all(), 'delete');
 

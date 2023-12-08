@@ -1,40 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use App\\Models\\HIModel;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+
 /**
- * @property integer $id
- * @property integer $created_by
- * @property integer $updated_by
- * @property string $name
- * @property string $address
- * @property string $phone_number
- * @property boolean $active
- * @property string $deleted_at
- * @property string $created_at
- * @property string $updated_at
- * @property MConfig[] $mConfigs
+ * @property int             $id
+ * @property int             $created_by
+ * @property int             $updated_by
+ * @property string          $name
+ * @property string          $address
+ * @property string          $phone_number
+ * @property bool            $active
+ * @property string          $deleted_at
+ * @property string          $created_at
+ * @property string          $updated_at
+ * @property MConfig[]       $mConfigs
  * @property RelPersonUser[] $relPersonUsers
- * @property MStudent[] $mStudents
- * @property MClass[] $mClasses
- * @property User $user
- * @property User $user
+ * @property MStudent[]      $mStudents
+ * @property MClass[]        $mClasses
+ * @property User            $user
+ * @property User            $user
  */
-class Mschool extends HIModel
+class MSchool extends HIModel
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'm_school';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -46,9 +48,14 @@ class Mschool extends HIModel
 
     public function getData(int $id = null)
     {
-        return DB::table($this->table)->select('*')->whereNull('deleted_at');
+        $result = DB::table($this->table)->select('*')->whereNull('deleted_at');
+        if (null !== $id) {
+            $result->where('id', $id);
+        }
+
+        return $result;
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -88,5 +95,4 @@ class Mschool extends HIModel
     {
         return $this->belongsTo('App\Models\User', 'created_by');
     }
-
 }
