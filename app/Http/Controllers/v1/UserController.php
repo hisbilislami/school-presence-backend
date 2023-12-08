@@ -51,18 +51,12 @@ class UserController extends Controller
         }
 
         $user = User::where('username', $request['username'])
-            ->first()
+            ->firstOrFail()
         ;
 
-        if ($user) {
-            if ('' === $user->email_verified_at || null === $user->email_verified_at) {
-                return response()->json([
-                    'message' => 'Unverified. Please, verify your email address.',
-                ], 401);
-            }
-        } else {
+        if ('' === $user->email_verified_at || null === $user->email_verified_at) {
             return response()->json([
-                'message' => 'Username not found.',
+                'message' => 'Unverified. Please, verify your email address.',
             ], 401);
         }
 
