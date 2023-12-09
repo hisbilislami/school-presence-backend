@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -54,6 +56,14 @@ class User extends Authenticatable
     use HasApiTokens;
     use HasFactory;
     use Notifiable;
+    use SoftDeletes;
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
     /**
      * The "type" of the auto-incrementing ID.
      *
@@ -64,7 +74,20 @@ class User extends Authenticatable
     /**
      * @var array
      */
-    protected $fillable = ['created_by', 'updated_by', 'username', 'email', 'email_verified_at', 'password', 'type', 'active', 'remember_token', 'created_at', 'updated_at', 'deleted_at'];
+    protected $fillable = [
+        'created_by',
+        'updated_by',
+        'username',
+        'email',
+        'email_verified_at',
+        'password',
+        'type',
+        'active',
+        'remember_token',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -85,6 +108,22 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function getData(int $id = null)
+    {
+        $result = DB::table($this->table, 'u')
+            ->select('u.*', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender', 'rpu.person_id')
+            ->join('rel_person_user as rpu', 'rpu.user_id', '=', 'u.id')
+            ->join('m_person as mpn', 'mpn.id', '=', 'rpu.person_id')
+            ->whereNull(['u.deleted_at', 'mpn.deleted_at', 'rpu.deleted_at'])
+        ;
+
+        if (null !== $id) {
+            $result->where('id', $id);
+        }
+
+        return $result;
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
