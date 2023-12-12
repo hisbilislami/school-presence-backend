@@ -29,8 +29,8 @@ class MParentController extends Controller
     public function get(Request $request)
     {
         try {
-            $id= $request->id;
-            $id = $id !== null ? (int)$id : null;
+            $id = $request->id;
+            $id = null !== $id ? (int) $id : null;
             $result = $this->model->getData($id);
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'mp.email', 'mp.mobile_phone_number'];
 
