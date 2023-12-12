@@ -6,10 +6,9 @@ namespace App\Http\Controllers\v1;
 
 use App\Enums\DefaultMessages;
 use App\Http\Controllers\Controller;
-use App\Models\MPerson;
 use App\Models\MParent;
+use App\Models\MPerson;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -30,7 +29,9 @@ class MParentController extends Controller
     public function get(Request $request)
     {
         try {
-            $result = $this->model->getData($request->id);
+            $id= $request->id;
+            $id = $id !== null ? (int)$id : null;
+            $result = $this->model->getData($id);
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'mp.email', 'mp.mobile_phone_number'];
 
             return $this->okApiResponse($result, '', $searchFields);
@@ -65,7 +66,15 @@ class MParentController extends Controller
                 if ($check) {
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
-
+                $person = [
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'address' => $data['address'],
+                    'gender' => $data['gender'],
+                    'active' => true,
+                ];
+                $personSave = $this->personModel->batchOperations([$person], 'insert');
+                $personId = $personSave['success'][0]['id'];
                 $results = $this->model->batchOperations([$data], 'insert');
             }
             DB::commit();

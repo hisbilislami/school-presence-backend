@@ -1,38 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 /**
- * @property integer $id
- * @property integer $person_id
- * @property integer $created_by
- * @property integer $updated_by
- * @property string $email
- * @property string $mobile_phone_number
- * @property boolean $active
- * @property string $created_at
- * @property string $updated_at
- * @property string $deleted_at
+ * @property int                $id
+ * @property int                $person_id
+ * @property int                $created_by
+ * @property int                $updated_by
+ * @property string             $email
+ * @property string             $mobile_phone_number
+ * @property bool               $active
+ * @property string             $created_at
+ * @property string             $updated_at
+ * @property string             $deleted_at
  * @property RelParentStudent[] $relParentStudents
- * @property MPerson $mPerson
- * @property User $user
- * @property User $user
+ * @property MPerson            $mPerson
+ * @property User               $user
+ * @property User               $user
  */
 class MParent extends HIModel
 {
     /**
      * The table associated with the model.
-     * 
+     *
      * @var string
      */
     protected $table = 'm_parent';
 
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -47,10 +48,11 @@ class MParent extends HIModel
         $result = DB::table($this->table, 'mp')
             ->select('mp.*', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender')
             ->join('m_person as mpn', 'mpn.id', '=', 'mp.person_id')
-            ->whereNull(['mp.deleted_at', 'mpn.deleted_at']);
+            ->whereNull(['mp.deleted_at', 'mpn.deleted_at'])
+        ;
 
         if (null !== $id) {
-            $result->where('id', $id);
+            $result->where('mp.id', $id);
         }
 
         return $result;
