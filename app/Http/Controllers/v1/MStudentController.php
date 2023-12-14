@@ -30,7 +30,9 @@ class MStudentController extends Controller
     public function get(Request $request)
     {
         try {
-            $result = $this->model->getData($request->id);
+            $id = $request->id;
+            $id = null !== $id ? (int) $id : null;
+            $result = $this->model->getData($id);
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'ms.nis', 'ms.email'];
 
             return $this->okApiResponse($result, '', $searchFields);

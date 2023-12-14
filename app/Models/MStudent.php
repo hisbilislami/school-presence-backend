@@ -56,7 +56,7 @@ class MStudent extends HIModel
         ;
 
         if (null !== $id) {
-            $result->where('id', $id);
+            $result->where('ms.id', $id);
         }
 
         return $result;

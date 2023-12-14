@@ -67,14 +67,14 @@ class MParentController extends Controller
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
                 $person = [
+                    'id' => $data['person_id'],
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
                     'gender' => $data['gender'],
                     'active' => true,
                 ];
-                $personSave = $this->personModel->batchOperations([$person], 'insert');
-                $personId = $personSave['success'][0]['id'];
+                $personSave = $this->personModel->batchOperations([$person], 'insert person');
                 $results = $this->model->batchOperations([$data], 'insert');
             }
             DB::commit();
@@ -107,6 +107,10 @@ class MParentController extends Controller
                     '*.person_id' => 'required|integer|exists:m_person,id',
                     '*.email' => 'nullable|string|email',
                     '*.mobile_phone_number' => 'required|string|max:20',
+                    '*.first_name' => 'required|string|max:20',
+                    '*.last_name' => 'required|string|max:20',
+                    '*.address' => 'nullable|string',
+                    '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                 ]
             );
@@ -117,8 +121,28 @@ class MParentController extends Controller
                 if ($check && $check->id !== (int) $data['id']) {
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
+                $person = [
+                    'id' => $data['person_id'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'address' => $data['address'],
+                    'gender' => $data['gender'],
+                    'active' => true,
+                ];
 
-                $results = $this->model->batchOperations([$data], 'update');
+                $this->personModel->batchOperations([$person], 'update person');
+
+                $parent = [
+                    'id' => $data['id'],
+                    'person_id' => $data['person_id'],
+                    'email' => $data['email'],
+                    'mobile_phone_number' => $data['mobile_phone_number'],
+                    'active' => true,
+                ];
+
+                $parentUpdate = $this->model->batchOperations([$parent], 'update');
+
+                $results = $parentUpdate;
             }
             DB::commit();
 
@@ -150,6 +174,23 @@ class MParentController extends Controller
                     '*.id' => 'required|integer|exists:m_parent,id',
                 ]
             );
+
+            foreach ($request->all() as $req) {
+                // get Id MParent From Request
+                $id = $req['id'];
+
+                // find whole data with relation
+                $parent = MParent::where('id', $id)
+                    ->first()
+                ;
+
+                if ($parent) {
+                    $person = MPerson::where('id', $parent->person_id)->first();
+                    if ($person) {
+                        $person->delete();
+                    }
+                }
+            }
 
             $results = $this->model->batchOperations($request->all(), 'delete');
             DB::commit();
