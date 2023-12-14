@@ -61,6 +61,10 @@ class MHomeRoomTeacherController extends Controller
                     '*.class_id' => 'required|integer|exists:m_class,id',
                     '*.person_id' => 'required|integer|exists:m_person,id',
                     '*.mobile_phone_number' => 'nullable|string',
+                    '*.first_name' => 'required|string|max:20',
+                    '*.last_name' => 'required|string|max:20',
+                    '*.address' => 'nullable|string',
+                    '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                 ]
             );
@@ -78,7 +82,7 @@ class MHomeRoomTeacherController extends Controller
                     'gender' => $data['gender'],
                     'active' => true,
                 ];
-                $personSave = $this->personModel->batchOperations([$person], 'insert person');
+                $this->personModel->batchOperations([$person], 'insert person');
 
                 $results = $this->model->batchOperations([$data], 'insert');
             }
@@ -113,6 +117,10 @@ class MHomeRoomTeacherController extends Controller
                     '*.class_id' => 'required|integer|exists:m_class,id',
                     '*.person_id' => 'required|integer|exists:m_person,id',
                     '*.mobile_phone_number' => 'nullable|string',
+                    '*.first_name' => 'required|string|max:20',
+                    '*.last_name' => 'required|string|max:20',
+                    '*.address' => 'nullable|string',
+                    '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                 ]
             );
@@ -131,10 +139,19 @@ class MHomeRoomTeacherController extends Controller
                     'gender' => $data['gender'],
                     'active' => true,
                 ];
-
                 $this->personModel->batchOperations([$person], 'update person');
 
-                $results = $this->model->batchOperations([$data], 'update');
+                $homeRoomTeacher = [
+                    'id' => $data['id'],
+                    'email' => $data['email'],
+                    'class_id' => $data['class_id'],
+                    'person_id' => $data['person_id'],
+                    'mobile_phone_number' => $data['mobile_phone_number'],
+                    'active' => true,
+                ];
+                $updateHomeRoomTeacher = $this->model->batchOperations([$homeRoomTeacher], 'update');
+
+                $results = $updateHomeRoomTeacher;
             }
             DB::commit();
 
