@@ -33,7 +33,9 @@ class MHomeRoomTeacherController extends Controller
     public function get(Request $request)
     {
         try {
-            $result = $this->model->getData($request->id);
+            $id = $request->id;
+            $id = null !== $id ? (int) $id : null;
+            $result = $this->model->getData($id);
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'mhr.email', 'mc.name'];
 
             return $this->okApiResponse($result, '', $searchFields);
@@ -69,6 +71,15 @@ class MHomeRoomTeacherController extends Controller
                 if ($check) {
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
+                $person = [
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'address' => $data['address'],
+                    'gender' => $data['gender'],
+                    'active' => true,
+                ];
+                $personSave = $this->personModel->batchOperations([$person], 'insert person');
+
                 $results = $this->model->batchOperations([$data], 'insert');
             }
             DB::commit();
@@ -112,6 +123,16 @@ class MHomeRoomTeacherController extends Controller
                 if ($check && $check->id !== (int) $data['id']) {
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
+                $person = [
+                    'id' => $data['person_id'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'address' => $data['address'],
+                    'gender' => $data['gender'],
+                    'active' => true,
+                ];
+
+                $this->personModel->batchOperations([$person], 'update person');
 
                 $results = $this->model->batchOperations([$data], 'update');
             }
@@ -145,8 +166,23 @@ class MHomeRoomTeacherController extends Controller
                     '*.id' => 'required|integer|exists:m_homeroom_teacher,id',
                 ]
             );
+            foreach ($request->all() as $req) {
+                // get Id MStudent From Request
+                $id = $req['id'];
 
+                // find whole data with relation
+                $homeRoomTeacher = MHomeRoomTeacher::where('id', $id)
+                    ->first();
+
+                if ($homeRoomTeacher) {
+                    $person = MPerson::where('id', $homeRoomTeacher->person_id)->first();
+                    if ($person) {
+                        $person->delete();
+                    }
+                }
+            }
             $results = $this->model->batchOperations($request->all(), 'delete');
+            DB::commit();
 
             return $this->okApiResponse($results);
         } catch (ValidationException $e) {
