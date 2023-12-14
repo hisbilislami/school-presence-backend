@@ -56,6 +56,10 @@ class MParentController extends Controller
                     '*.person_id' => 'required|integer|exists:m_person,id',
                     '*.email' => 'nullable|string|email',
                     '*.mobile_phone_number' => 'required|string|max:20',
+                    '*.first_name' => 'required|string|max:20',
+                    '*.last_name' => 'required|string|max:20',
+                    '*.address' => 'nullable|string',
+                    '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                 ]
             );
