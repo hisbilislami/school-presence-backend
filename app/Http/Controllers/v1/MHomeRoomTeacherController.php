@@ -172,7 +172,8 @@ class MHomeRoomTeacherController extends Controller
 
                 // find whole data with relation
                 $homeRoomTeacher = MHomeRoomTeacher::where('id', $id)
-                    ->first();
+                    ->first()
+                ;
 
                 if ($homeRoomTeacher) {
                     $person = MPerson::where('id', $homeRoomTeacher->person_id)->first();
