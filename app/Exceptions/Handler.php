@@ -42,7 +42,7 @@ class Handler extends ExceptionHandler
                         $this->shouldReport($e)
                         && \in_array(app()->environment(), ['development', 'production'], true)
                     ) {
-                        Log::info($e);
+                        Log::info($e->getMessage());
                     }
                 }
             );
