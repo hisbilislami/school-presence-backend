@@ -16,9 +16,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
     /**
      * Bootstrap any application services.
@@ -31,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('local')) {
             Model::preventLazyLoading(true);
             // Error handler
-            Model::handleLazyLoadingViolationUsing(function ($model, $relation): void {
+            Model::handleLazyLoadingViolationUsing(static function ($model, $relation): void {
                 $class = $model->{$relation}()->getRelated();
 
                 if (Str::startsWith(\get_class($class), 'App')) {
@@ -40,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        Validator::extend('valid_person_student_relation', function ($attribute, $value, $parameters, $validator) {
+        Validator::extend('valid_person_student_relation', static function ($attribute, $value, $parameters, $validator) {
             // Check if the ID exists in m_person and is related to m_student
             return DB::table('m_person')
                 ->where('m_person.id', $value)

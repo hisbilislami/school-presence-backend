@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class MParentController extends PersonBaseController
 {
@@ -41,7 +40,7 @@ class MParentController extends PersonBaseController
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'mp.email', 'mp.mobile_phone_number'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -69,7 +68,7 @@ class MParentController extends PersonBaseController
                     '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                     '*.children' => 'required|array',
-                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(function ($query): void {
+                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(static function ($query): void {
                         $query->from('m_person')->join('m_student', 'm_student.person_id', '=', 'm_person.id');
                     }), 'valid_person_student_relation'],
                 ]
@@ -118,7 +117,7 @@ class MParentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -149,7 +148,7 @@ class MParentController extends PersonBaseController
                     '*.gender' => 'required|string|max:1|in:m,f',
                     '*.active' => 'required|boolean',
                     '*.children' => 'required|array',
-                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(function ($query): void {
+                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(static function ($query): void {
                         $query->from('m_person')->join('m_student', 'm_student.person_id', '=', 'm_person.id');
                     }), 'valid_person_student_relation'],
                 ]
@@ -202,7 +201,7 @@ class MParentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
@@ -259,7 +258,7 @@ class MParentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
