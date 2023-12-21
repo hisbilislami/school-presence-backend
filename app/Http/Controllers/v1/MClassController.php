@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class MClassController extends Controller
 {
@@ -32,7 +31,7 @@ class MClassController extends Controller
             $searchFields = ['m_class.name', 'm_class.code'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -72,7 +71,7 @@ class MClassController extends Controller
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -114,7 +113,7 @@ class MClassController extends Controller
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -141,7 +140,7 @@ class MClassController extends Controller
             DB::commit();
 
             return $this->okApiResponse($results);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;

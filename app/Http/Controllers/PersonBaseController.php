@@ -7,8 +7,6 @@ namespace App\Http\Controllers;
 use App\Enums\DefaultMessages;
 use App\Models\MPerson;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
-use Throwable;
 
 class PersonBaseController extends Controller
 {
@@ -24,11 +22,11 @@ class PersonBaseController extends Controller
      *
      * @param array payload {
      *
-     *      @var first_name string|required
-     *      @var last_name string|required
-     *      @var address string|nullable
-     *      @var gender string|(m|f)|required
-     *      @var active boolean|required
+     * @var first_name string|required
+     * @var last_name  string|required
+     * @var address    string|nullable
+     * @var gender     string|(m|f)|required
+     * @var active     boolean|required
      *
      * }
      */
@@ -42,14 +40,14 @@ class PersonBaseController extends Controller
                 && (!isset($payload['gender']) || !\is_string($payload['gender']))
                 && (!isset($payload['active']) || !\is_bool($payload['active']))
             ) {
-                throw new InvalidArgumentException('Missing or invalid parameters.');
+                throw new \InvalidArgumentException('Missing or invalid parameters.');
             }
 
             $results = $this->personModel->batchOperations([$payload], 'insert');
             DB::commit();
 
             return $results;
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -64,12 +62,12 @@ class PersonBaseController extends Controller
      *
      * @param array payload {
      *
-     *      @var id integer|required
-     *      @var first_name string|required
-     *      @var last_name string|required
-     *      @var address string|nullable
-     *      @var gender string|(m|f)|required
-     *      @var active boolean|required
+     * @var id         integer|required
+     * @var first_name string|required
+     * @var last_name  string|required
+     * @var address    string|nullable
+     * @var gender     string|(m|f)|required
+     * @var active     boolean|required
      *
      * }
      */
@@ -84,13 +82,13 @@ class PersonBaseController extends Controller
                 && (!isset($payload['gender']) || !\is_string($payload['gender']))
                 && (!isset($payload['active']) || !\is_bool($payload['active']))
             ) {
-                throw new InvalidArgumentException('Missing or invalid parameters.');
+                throw new \InvalidArgumentException('Missing or invalid parameters.');
             }
             $results = $this->personModel->batchOperations([$payload], 'update');
             DB::commit();
 
             return $results;
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -111,7 +109,7 @@ class PersonBaseController extends Controller
             DB::commit();
 
             return $results;
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;

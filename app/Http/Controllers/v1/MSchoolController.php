@@ -10,7 +10,6 @@ use App\Models\MSchool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class MSchoolController extends Controller
 {
@@ -31,7 +30,7 @@ class MSchoolController extends Controller
             $searchFields = ['m_school.name'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -72,7 +71,7 @@ class MSchoolController extends Controller
             DB::commit();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -116,7 +115,7 @@ class MSchoolController extends Controller
             DB::commit();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -142,7 +141,7 @@ class MSchoolController extends Controller
             $results = $this->model->batchOperations($request->all(), 'delete');
 
             return $this->okApiResponse($results);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }

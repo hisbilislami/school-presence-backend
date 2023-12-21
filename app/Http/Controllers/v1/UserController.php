@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class UserController extends PersonBaseController
 {
@@ -145,7 +144,7 @@ class UserController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -162,7 +161,7 @@ class UserController extends PersonBaseController
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'u.username', 'u.email'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -209,7 +208,7 @@ class UserController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;

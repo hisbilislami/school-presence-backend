@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
 class MStudentController extends PersonBaseController
 {
@@ -35,7 +34,7 @@ class MStudentController extends PersonBaseController
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'ms.nis', 'ms.email'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -100,7 +99,7 @@ class MStudentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -169,7 +168,7 @@ class MStudentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
@@ -218,7 +217,7 @@ class MStudentController extends PersonBaseController
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
