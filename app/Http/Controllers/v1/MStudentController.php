@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers\v1;
 
 use App\Enums\DefaultMessages;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\PersonBaseController;
 use App\Models\MPerson;
 use App\Models\MStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
-class MStudentController extends Controller
+class MStudentController extends PersonBaseController
 {
     protected $model;
-    protected $personModel;
+    public $personModel;
 
     public function __construct()
     {
@@ -34,7 +35,7 @@ class MStudentController extends Controller
             $searchFields = ['mpn.first_name', 'mpn.last_name', 'ms.nis', 'ms.email'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -48,10 +49,12 @@ class MStudentController extends Controller
      */
     public function insert(Request $request)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.nis' => 'required|string|max:25',
                     '*.first_name' => 'required|string|max:20',
                     '*.last_name' => 'required|string|max:20',
@@ -75,7 +78,9 @@ class MStudentController extends Controller
                     'gender' => $data['gender'],
                     'active' => true,
                 ];
-                $personSave = $this->personModel->batchOperations([$person], 'insert');
+
+                // insert to m_person through the PersonBaseController
+                $personSave = $this->insertData($person);
                 $personId = $personSave['success'][0]['id'];
 
                 $student = [
@@ -90,12 +95,12 @@ class MStudentController extends Controller
             }
             DB::commit();
 
-            return $this->createdApiResponse($results);
+            return $this->okApiResponse([$results]);
         } catch (ValidationException $e) {
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -114,6 +119,8 @@ class MStudentController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.id' => 'required|integer|exists:m_student,id',
                     '*.person_id' => 'required|integer|exists:m_person,id',
                     '*.nis' => 'required|string|max:25',
@@ -134,7 +141,7 @@ class MStudentController extends Controller
                 }
 
                 $person = [
-                    'id' => $data['person_id'],
+                    'id' => (int) $data['person_id'],
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
@@ -142,7 +149,8 @@ class MStudentController extends Controller
                     'active' => true,
                 ];
 
-                $this->personModel->batchOperations([$person], 'update');
+                // update data in m_person through PersonBaseController
+                $this->updateData($person);
 
                 $student = [
                     'id' => $data['id'],
@@ -161,7 +169,7 @@ class MStudentController extends Controller
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;
@@ -210,7 +218,7 @@ class MStudentController extends Controller
             DB::rollBack();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             DB::rollBack();
             if (config('app.debug')) {
                 throw $th;

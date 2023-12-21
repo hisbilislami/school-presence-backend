@@ -10,6 +10,7 @@ use App\Models\MSchool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class MSchoolController extends Controller
 {
@@ -30,7 +31,7 @@ class MSchoolController extends Controller
             $searchFields = ['m_school.name'];
 
             return $this->okApiResponse($result, '', $searchFields);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -48,6 +49,8 @@ class MSchoolController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.name' => 'required|string',
                     '*.address' => 'required|string',
                     '*.phone_number' => 'required|string',
@@ -69,7 +72,7 @@ class MSchoolController extends Controller
             DB::commit();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -82,12 +85,14 @@ class MSchoolController extends Controller
     /**
      * Update data batch or single.
      */
-    public function Update(Request $request)
+    public function update(Request $request)
     {
         try {
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.id' => 'required|integer|exists:m_school,id',
                     '*.name' => 'required|string',
                     '*.address' => 'required|string',
@@ -111,7 +116,7 @@ class MSchoolController extends Controller
             DB::commit();
 
             return $this->forbiddenApiResponse($e->errors(), $e->getMessage());
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
@@ -137,7 +142,7 @@ class MSchoolController extends Controller
             $results = $this->model->batchOperations($request->all(), 'delete');
 
             return $this->okApiResponse($results);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
