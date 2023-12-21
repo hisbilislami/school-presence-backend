@@ -249,4 +249,6 @@ return [
         'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
         'LaravelLocalization' => Mcamara\LaravelLocalization\Facades\LaravelLocalization::class,
     ])->toArray(),
+
+    'api_request_limit' => env('API_REQUEST_LIMIT', 500),
 ];

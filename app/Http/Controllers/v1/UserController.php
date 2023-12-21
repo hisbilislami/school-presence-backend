@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\v1;
 
 use App\Enums\DefaultMessages;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\PersonBaseController;
 use App\Models\MPerson;
 use App\Models\RelPersonUser;
 use App\Models\User;
@@ -17,17 +17,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
-class UserController extends Controller
+class UserController extends PersonBaseController
 {
     protected $model;
-    protected $personModel;
     protected $relPersonUserModel;
+    public $personModel;
 
     public function __construct()
     {
         $this->model = new User();
-        $this->personModel = new MPerson();
         $this->relPersonUserModel = new RelPersonUser();
+        $this->personModel = new MPerson();
     }
 
     /**
@@ -76,6 +76,8 @@ class UserController extends Controller
         try {
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.username' => 'required|string|max:15|unique:users,username',
                     '*.email' => 'required|string|email|unique:users,email',
                     '*.password' => [
@@ -110,7 +112,7 @@ class UserController extends Controller
                     'gender' => $data['gender'],
                     'active' => $data['active'],
                 ];
-                $personSave = $this->personModel->batchOperations([$person], 'insert');
+                $personSave = $this->insertData($person);
                 $personId = $personSave['success'][0]['id'];
 
                 $user = [

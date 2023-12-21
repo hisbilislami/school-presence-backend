@@ -48,6 +48,8 @@ class MSchoolController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.name' => 'required|string',
                     '*.address' => 'required|string',
                     '*.phone_number' => 'required|string',
@@ -82,12 +84,14 @@ class MSchoolController extends Controller
     /**
      * Update data batch or single.
      */
-    public function Update(Request $request)
+    public function update(Request $request)
     {
         try {
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.id' => 'required|integer|exists:m_school,id',
                     '*.name' => 'required|string',
                     '*.address' => 'required|string',
