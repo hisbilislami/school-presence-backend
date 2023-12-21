@@ -15,7 +15,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -37,7 +36,7 @@ class Handler extends ExceptionHandler
     {
         try {
             $this->reportable(
-                function (Throwable $e): void {
+                function (\Throwable $e): void {
                     // report only in development and production environment
                     if (
                         $this->shouldReport($e)
@@ -47,14 +46,14 @@ class Handler extends ExceptionHandler
                     }
                 }
             );
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }
         }
     }
 
-    public function render($request, Throwable|Request $exception = null)
+    public function render($request, Request|\Throwable $exception = null)
     {
         try {
             if ($exception instanceof AuthorizationException) {
@@ -117,12 +116,12 @@ class Handler extends ExceptionHandler
                 return response()->json($data, $data['statusCode']);
             }
 
-            if (config('app.debug') && $exception instanceof Throwable) {
+            if (config('app.debug') && $exception instanceof \Throwable) {
                 return response($exception->__toString());
             }
 
             return response('Content not found', 204);
-        } catch (Throwable $th) {
+        } catch (\Throwable $th) {
             if (config('app.debug')) {
                 throw $th;
             }

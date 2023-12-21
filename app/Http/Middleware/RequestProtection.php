@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 
 class RequestProtection
 {
     /**
      * Handle an incoming request.
-     *
-     * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, \Closure $next)
     {
         // set default timezone on handle request
         $timezone = auth()->user()->plant->timezone ?? 'Asia/Jakarta';
@@ -28,7 +25,7 @@ class RequestProtection
         // strip every input value. String only
         array_walk_recursive(
             $input,
-            function (&$input): void {
+            static function (&$input): void {
                 $input = \is_string($input) ? htmlspecialchars(trim($input)) : $input;
             }
         );

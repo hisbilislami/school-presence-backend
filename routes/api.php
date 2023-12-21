@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['throttle:30,1'])->group(function (): void {
+Route::middleware(['throttle:30,1'])->group(static function (): void {
     Route::post('/login', [App\Http\Controllers\v1\UserController::class, 'login']);
     Route::post('/register', [App\Http\Controllers\v1\UserController::class, 'register']);
 });
