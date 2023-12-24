@@ -57,14 +57,15 @@ class MHomeRoomTeacherController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
-                    '*.email' => 'required|string|max:25',
-                    '*.class_id' => 'required|integer|exists:m_class,id',
-                    '*.person_id' => 'required|integer|exists:m_person,id',
-                    '*.mobile_phone_number' => 'nullable|string',
+                    'required|array',
+                    '*' => 'required|array',
                     '*.first_name' => 'required|string|max:20',
                     '*.last_name' => 'required|string|max:20',
                     '*.address' => 'nullable|string',
                     '*.gender' => 'required|string|max:1|in:m,f',
+                    '*.email' => 'required|string|email|unique:m_homeroom_teacher,email',
+                    '*.class_id' => 'required|integer|exists:m_class,id',
+                    '*.mobile_phone_number' => 'nullable|string',
                     '*.active' => 'required|boolean',
                 ]
             );
@@ -80,11 +81,20 @@ class MHomeRoomTeacherController extends Controller
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
                     'gender' => $data['gender'],
-                    'active' => true,
+                    'active' => $data['active'],
                 ];
-                $this->personModel->batchOperations([$person], 'insert person');
+                $personSave = $this->insertData($person);
+                $personId = $personSave['success'][0]['id'];
 
-                $results = $this->model->batchOperations([$data], 'insert');
+                $parent = [
+                    'person_id' => $personId,
+                    'class_id' => $data['class_id'],
+                    'email' => $data['email'],
+                    'mobile_phone_number' => $data['mobile_phone_number'],
+                    'active' => $data['active'],
+                ];
+
+                $results = $this->model->batchOperations([$parent], 'insert');
             }
             DB::commit();
 
