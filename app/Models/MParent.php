@@ -4,36 +4,32 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 /**
  * @property int                $id
+ * @property int                $person_id
  * @property int                $created_by
  * @property int                $updated_by
- * @property int                $school_id
- * @property int                $person_id
- * @property string             $nis
  * @property string             $email
+ * @property string             $mobile_phone_number
  * @property bool               $active
  * @property string             $created_at
  * @property string             $updated_at
  * @property string             $deleted_at
  * @property RelParentStudent[] $relParentStudents
+ * @property MPerson            $mPerson
  * @property User               $user
- * @property MSchool            $mSchool
  * @property User               $user
- * @property TPresence[]        $tPresences
  */
-class MStudent extends HIModel
+class MParent extends HIModel
 {
-    use SoftDeletes;
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'm_student';
+    protected $table = 'm_parent';
 
     /**
      * The "type" of the auto-incrementing ID.
@@ -45,18 +41,18 @@ class MStudent extends HIModel
     /**
      * @var array
      */
-    protected $fillable = ['created_by', 'updated_by', 'school_id', 'person_id', 'nis', 'email', 'active', 'created_at', 'updated_at', 'deleted_at'];
+    protected $fillable = ['person_id', 'created_by', 'updated_by', 'email', 'mobile_phone_number', 'active', 'created_at', 'updated_at', 'deleted_at'];
 
     public function getData(int $id = null)
     {
-        $result = DB::table($this->table, 'ms')
-            ->select('ms.*', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender')
-            ->join('m_person as mpn', 'mpn.id', '=', 'ms.person_id')
-            ->whereNull(['ms.deleted_at', 'mpn.deleted_at'])
+        $result = DB::table($this->table, 'mp')
+            ->select('mp.*', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender')
+            ->join('m_person as mpn', 'mpn.id', '=', 'mp.person_id')
+            ->whereNull(['mp.deleted_at', 'mpn.deleted_at'])
         ;
 
         if (null !== $id) {
-            $result->where('ms.id', $id);
+            $result->where('mp.id', $id);
         }
 
         return $result;
@@ -67,7 +63,15 @@ class MStudent extends HIModel
      */
     public function relParentStudents()
     {
-        return $this->hasMany('App\Models\RelParentStudent', 'student_id');
+        return $this->hasMany('App\Models\RelParentStudent', 'parent_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function mPerson()
+    {
+        return $this->belongsTo('App\Models\MPerson', 'person_id');
     }
 
     /**
@@ -81,24 +85,8 @@ class MStudent extends HIModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function mSchool()
-    {
-        return $this->belongsTo('App\Models\MSchool', 'school_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function userUpdatedBy()
     {
         return $this->belongsTo('App\Models\User', 'updated_by');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function tPresences()
-    {
-        return $this->hasMany('App\Models\TPresence', 'student_id');
     }
 }

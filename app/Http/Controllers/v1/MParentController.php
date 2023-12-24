@@ -6,22 +6,26 @@ namespace App\Http\Controllers\v1;
 
 use App\Enums\DefaultMessages;
 use App\Http\Controllers\PersonBaseController;
+use App\Models\MParent;
 use App\Models\MPerson;
 use App\Models\MStudent;
+use App\Models\RelParentStudent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-class MStudentController extends PersonBaseController
+class MParentController extends PersonBaseController
 {
     protected $model;
+    protected $relParentStudentModel;
     public $personModel;
 
     public function __construct()
     {
-        $this->model = new MStudent();
+        $this->model = new MParent();
         $this->personModel = new MPerson();
+        $this->relParentStudentModel = new RelParentStudent();
     }
 
     /**
@@ -33,7 +37,7 @@ class MStudentController extends PersonBaseController
             $id = $request->id;
             $id = null !== $id ? (int) $id : null;
             $result = $this->model->getData($id);
-            $searchFields = ['mpn.first_name', 'mpn.last_name', 'ms.nis', 'ms.email'];
+            $searchFields = ['mpn.first_name', 'mpn.last_name', 'mp.email', 'mp.mobile_phone_number'];
 
             return $this->okApiResponse($result, '', $searchFields);
         } catch (\Throwable $th) {
@@ -50,53 +54,65 @@ class MStudentController extends PersonBaseController
      */
     public function insert(Request $request)
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
             $request->validate(
                 [
                     'required|array',
                     '*' => 'required|array',
-                    '*.nis' => 'required|string|max:25',
+                    '*.email' => 'required|string|email|unique:m_parent,email',
+                    '*.mobile_phone_number' => 'nullable|string',
                     '*.first_name' => 'required|string|max:20',
                     '*.last_name' => 'required|string|max:20',
                     '*.address' => 'nullable|string',
                     '*.gender' => 'required|string|max:1|in:m,f',
-                    '*.email' => 'nullable|string|email',
                     '*.active' => 'required|boolean',
+                    '*.children' => 'required|array',
+                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(static function ($query): void {
+                        $query->from('m_person')->join('m_student', 'm_student.person_id', '=', 'm_person.id');
+                    }), 'valid_person_student_relation'],
                 ]
             );
 
             $results = null;
             foreach ($request->all() as $data) {
-                $check = MStudent::where('school_id', Auth::user()->relPersonUsers[0]->school_id)->where('nis', $data['nis'])->first();
+                $check = MParent::where('email', $data['email'])->first();
                 if ($check) {
-                    return $this->badRequestApiResponse(['message' => 'The student you entered already exist!']);
+                    return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
                 $person = [
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
                     'gender' => $data['gender'],
-                    'active' => true,
+                    'active' => $data['active'],
                 ];
-
-                // insert to m_person through the PersonBaseController
                 $personSave = $this->insertData($person);
                 $personId = $personSave['success'][0]['id'];
 
-                $student = [
+                $parent = [
                     'person_id' => $personId,
-                    'nis' => $data['nis'],
                     'email' => $data['email'],
-                    'school_id' => Auth::user()->relPersonUsers[0]->school_id,
+                    'mobile_phone_number' => $data['mobile_phone_number'],
+                    'active' => $data['active'],
                 ];
 
-                $studentSave = $this->model->batchOperations([$student], 'insert');
-                $results = $studentSave;
+                $results = $this->model->batchOperations([$parent], 'insert');
+                $parentId = $results['success'][0]['id'];
+
+                foreach ($data['children'] as $children) {
+                    $studentId = MStudent::where('person_id', $children['person_id'])->first();
+                    if ($studentId) {
+                        RelParentStudent::updateOrCreate(
+                            ['parent_id' => $parentId, 'student_id' => $studentId->id],
+                            ['parent_id' => $parentId, 'student_id' => $studentId->id]
+                        );
+                    }
+                }
             }
             DB::commit();
 
-            return $this->okApiResponse([$results]);
+            return $this->createdApiResponse($results);
         } catch (ValidationException $e) {
             DB::rollBack();
 
@@ -122,23 +138,28 @@ class MStudentController extends PersonBaseController
                 [
                     'required|array',
                     '*' => 'required|array',
-                    '*.id' => 'required|integer|exists:m_student,id',
                     '*.person_id' => 'required|integer|exists:m_person,id',
-                    '*.nis' => 'required|string|max:25',
+                    '*.id' => 'required|integer|exists:m_parent,id',
+                    '*.email' => 'required|string|email|unique:m_parent,email',
+                    '*.mobile_phone_number' => 'nullable|string',
                     '*.first_name' => 'required|string|max:20',
                     '*.last_name' => 'required|string|max:20',
                     '*.address' => 'nullable|string',
                     '*.gender' => 'required|string|max:1|in:m,f',
-                    '*.email' => 'nullable|string|email',
                     '*.active' => 'required|boolean',
+                    '*.children' => 'required|array',
+                    '*.children.*.person_id' => ['required', 'integer', Rule::exists('m_person', 'id')->where(static function ($query): void {
+                        $query->from('m_person')->join('m_student', 'm_student.person_id', '=', 'm_person.id');
+                    }), 'valid_person_student_relation'],
                 ]
             );
 
             $results = null;
             foreach ($request->all() as $data) {
-                $check = MStudent::where('school_id', Auth::user()->relPersonUsers[0]->school_id)->where('nis', $data['nis'])->first();
+                $check = MParent::where('email', $data['email'])->first();
+
                 if ($check && $check->id !== (int) $data['id']) {
-                    return $this->badRequestApiResponse(['message' => 'The student you entered already exist!']);
+                    return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
 
                 $person = [
@@ -150,18 +171,28 @@ class MStudentController extends PersonBaseController
                     'active' => true,
                 ];
 
-                // update data in m_person through PersonBaseController
                 $this->updateData($person);
 
-                $student = [
+                $parent = [
                     'id' => $data['id'],
                     'person_id' => $data['person_id'],
-                    'nis' => $data['nis'],
                     'email' => $data['email'],
-                    'school_id' => Auth::user()->relPersonUsers[0]->school_id,
+                    'mobile_phone_number' => $data['mobile_phone_number'],
+                    'active' => true,
                 ];
-                $studentUpdate = $this->model->batchOperations([$student], 'update');
-                $results = $studentUpdate;
+
+                $results = $this->model->batchOperations([$parent], 'update');
+                $parentId = $data['id'];
+
+                foreach ($data['children'] as $children) {
+                    $studentId = MStudent::where('person_id', $children['person_id'])->first();
+                    if ($studentId) {
+                        RelParentStudent::updateOrCreate(
+                            ['parent_id' => $parentId, 'student_id' => $studentId->id],
+                            ['parent_id' => $parentId, 'student_id' => $studentId->id]
+                        );
+                    }
+                }
             }
             DB::commit();
 
@@ -190,23 +221,31 @@ class MStudentController extends PersonBaseController
             DB::beginTransaction();
             $request->validate(
                 [
-                    '*.id' => 'required|integer|exists:m_student,id',
+                    '*.id' => 'required|integer|exists:m_parent,id',
                 ]
             );
 
             foreach ($request->all() as $req) {
-                // get Id MStudent From Request
+                // get Id MParent From Request
                 $id = $req['id'];
 
                 // find whole data with relation
-                $student = MStudent::where('id', $id)
+                $parent = MParent::where('id', $id)
                     ->first()
                 ;
 
-                if ($student) {
-                    $person = MPerson::where('id', $student->person_id)->first();
+                if ($parent) {
+                    $person = MPerson::where('id', $parent->person_id)->first();
                     if ($person) {
                         $person->delete();
+                    }
+                }
+
+                $relParentStudent = RelParentStudent::where('parent_id', $id)->get();
+
+                if (\count($relParentStudent) > 0) {
+                    foreach ($relParentStudent as $value) {
+                        $value->delete();
                     }
                 }
             }

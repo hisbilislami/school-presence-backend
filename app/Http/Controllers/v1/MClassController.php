@@ -49,6 +49,7 @@ class MClassController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    '*' => 'required',
                     '*.code' => 'required|string|max:10',
                     '*.name' => 'required|string',
                     '*.active' => 'required|boolean',
@@ -89,6 +90,7 @@ class MClassController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    '*' => 'required',
                     '*.id' => 'required|integer|exists:m_class,id',
                     '*.code' => 'required|string|max:10',
                     '*.name' => 'required|string',
