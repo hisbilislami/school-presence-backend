@@ -91,8 +91,13 @@ class MSchool extends HIModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function userCreatedBy()
     {
         return $this->belongsTo('App\Models\User', 'created_by');
+    }
+
+    public function userUpdatedBy()
+    {
+        return $this->belongsTo('App\Models\User', 'updated_by');
     }
 }
