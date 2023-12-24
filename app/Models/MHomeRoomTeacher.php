@@ -47,7 +47,7 @@ class MHomeRoomTeacher extends HIModel
     public function getData(int $id = null)
     {
         $result = DB::table($this->table, 'mhr')
-            ->select('mhr.*', 'mc.name', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender')
+            ->select('mhr.*', 'mc.name as class_name', 'mpn.first_name', 'mpn.last_name', 'mpn.address', 'mpn.gender')
             ->join('m_class as mc', 'mc.id', '=', 'mhr.class_id')
             ->join('m_person as mpn', 'mpn.id', '=', 'mhr.person_id')
             ->whereNull(['mhr.deleted_at', 'mc.deleted_at', 'mpn.deleted_at'])

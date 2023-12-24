@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\v1;
 
 use App\Enums\DefaultMessages;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\PersonBaseController;
 use App\Models\MClass;
 use App\Models\MHomeRoomTeacher;
 use App\Models\MPerson;
@@ -13,12 +13,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-class MHomeRoomTeacherController extends Controller
+class MHomeRoomTeacherController extends PersonBaseController
 {
     protected $model;
     protected $homeRoomTeacherModel;
     protected $classModel;
-    protected $personModel;
+    public $personModel;
 
     public function __construct()
     {
@@ -86,7 +86,7 @@ class MHomeRoomTeacherController extends Controller
                 $personSave = $this->insertData($person);
                 $personId = $personSave['success'][0]['id'];
 
-                $parent = [
+                $homeRoomTeacher = [
                     'person_id' => $personId,
                     'class_id' => $data['class_id'],
                     'email' => $data['email'],
@@ -94,7 +94,7 @@ class MHomeRoomTeacherController extends Controller
                     'active' => $data['active'],
                 ];
 
-                $results = $this->model->batchOperations([$parent], 'insert');
+                $results = $this->model->batchOperations([$homeRoomTeacher], 'insert');
             }
             DB::commit();
 
@@ -122,15 +122,16 @@ class MHomeRoomTeacherController extends Controller
             DB::beginTransaction();
             $request->validate(
                 [
+                    'required|array',
+                    '*' => 'required|array',
                     '*.id' => 'required|integer|exists:m_homeroom_teacher,id',
-                    '*.email' => 'required|string|max:25',
-                    '*.class_id' => 'required|integer|exists:m_class,id',
-                    '*.person_id' => 'required|integer|exists:m_person,id',
-                    '*.mobile_phone_number' => 'nullable|string',
                     '*.first_name' => 'required|string|max:20',
                     '*.last_name' => 'required|string|max:20',
                     '*.address' => 'nullable|string',
                     '*.gender' => 'required|string|max:1|in:m,f',
+                    '*.email' => ['required', 'string'],
+                    '*.class_id' => 'required|integer|exists:m_class,id',
+                    '*.mobile_phone_number' => 'nullable|string',
                     '*.active' => 'required|boolean',
                 ]
             );
@@ -141,21 +142,24 @@ class MHomeRoomTeacherController extends Controller
                 if ($check && $check->id !== (int) $data['id']) {
                     return $this->badRequestApiResponse(['message' => 'The email you entered already exist!']);
                 }
+
+                $homeRoomTeacher = MHomeRoomTeacher::find($data['id']);
+
                 $person = [
-                    'id' => $data['person_id'],
+                    'id' => $homeRoomTeacher['person_id'],
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
                     'gender' => $data['gender'],
                     'active' => true,
                 ];
-                $this->personModel->batchOperations([$person], 'update person');
+                $this->updateData($person);
 
                 $homeRoomTeacher = [
                     'id' => $data['id'],
                     'email' => $data['email'],
                     'class_id' => $data['class_id'],
-                    'person_id' => $data['person_id'],
+                    'person_id' => $homeRoomTeacher['person_id'],
                     'mobile_phone_number' => $data['mobile_phone_number'],
                     'active' => true,
                 ];
